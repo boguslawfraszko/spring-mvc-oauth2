@@ -33,7 +33,9 @@ public class SecurityConfig {
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login(httpSecurityOAuth2LoginConfigurer ->
-                            httpSecurityOAuth2LoginConfigurer.loginPage("/login"));
+                            httpSecurityOAuth2LoginConfigurer
+                                    .defaultSuccessUrl("/home")
+                                    .failureUrl("/login"));
 
         return http.build();
     }
