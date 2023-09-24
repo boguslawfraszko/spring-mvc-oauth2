@@ -29,12 +29,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                    .requestMatchers("/login").permitAll()
+                    .requestMatchers("/**login**", "/error", "/webjars/**", "/templates/**").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login(httpSecurityOAuth2LoginConfigurer ->
                             httpSecurityOAuth2LoginConfigurer
-                                    .defaultSuccessUrl("/home")
+                                    .defaultSuccessUrl("/")
                                     .failureUrl("/login"));
 
         return http.build();
