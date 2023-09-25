@@ -19,6 +19,9 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,13 +34,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                    .requestMatchers("/**login**", "/error", "/webjars/**", "/templates/**").permitAll()
+                    .requestMatchers("/**login**", "/**logout**", "/error", "/webjars/**", "/templates/**").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login(httpSecurityOAuth2LoginConfigurer ->
                             httpSecurityOAuth2LoginConfigurer
                                     .defaultSuccessUrl("/")
-                                    .failureUrl("/login"));
+                                    .loginPage("/login")
+
+                                    .failureUrl("/login"))
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.ALL)))
+                        .clearAuthentication(true))
+        ;
 
         return http.build();
     }
