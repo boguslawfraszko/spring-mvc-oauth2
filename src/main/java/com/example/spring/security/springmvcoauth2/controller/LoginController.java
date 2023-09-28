@@ -8,6 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
 @Controller
 public class LoginController {
 
@@ -16,15 +21,27 @@ public class LoginController {
         return "oauth2-login";
     }
 
-    @GetMapping("/logout")
-    public String performLogout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        request.logout();
-        return "redirect:/login";
+    @GetMapping("/logout-success2")
+    public String logoutSuccess() {
+        return "oauth2-login";
+
     }
 
-    @GetMapping("/error")
-    public String error(HttpServletRequest request) {
+    @GetMapping("/logout2")
+    public String performLogout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        request.logout();
+        return null;
+    }
+
+    //@GetMapping("/error")
+    public String error(HttpServletRequest request) throws IOException {
         System.out.println(request.getRequestURI());
+        System.out.println(
+                new BufferedReader(new InputStreamReader(request.getInputStream()))
+                        .lines()
+                        .collect(Collectors.joining(" "))
+        );
+
         return null;
     }
 }
