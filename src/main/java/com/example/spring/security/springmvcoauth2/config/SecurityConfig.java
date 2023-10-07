@@ -8,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -24,14 +26,18 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -44,24 +50,20 @@ public class SecurityConfig {
     private Environment env;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient,
-                                           OAuth2AuthorizedClientService authorizedClientService,
-                                           OAuth2AuthorizedClientRepository authorizedClientRepository
+    public SecurityFilterChain filterChain(HttpSecurity http
     ) throws Exception {
         http
                 .logout(logout -> logout.logoutUrl("/logout")
-                        .clearAuthentication(true))
+                        .clearAuthentication(true)
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")))
                 .authorizeRequests()
                     .requestMatchers("/**login**", "/**logout**", "/error", "/webjars/**", "/templates/**")
                 .permitAll()
                     .anyRequest().authenticated()
-                .and().oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
-                                .loginPage("/login")
-                                .failureUrl("/login?error")
-                                .tokenEndpoint(token -> token.accessTokenResponseClient(accessTokenResponseClient))
-                                .authorizedClientService(authorizedClientService)
-                                .authorizedClientRepository(authorizedClientRepository))
+                .and()
+                .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
+                        .loginPage("/login")
+                        .failureUrl("/login?error"))
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
         return http.build();
@@ -148,6 +150,36 @@ public class SecurityConfig {
                 .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
                 .clientName("Google")
                 .build();
+    }
+
+    @Bean
+    public GrantedAuthoritiesMapper userAuthoritiesMapper() {
+        return (authorities) -> {
+            Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
+
+            authorities.forEach(authority -> {
+                if (OidcUserAuthority.class.isInstance(authority)) {
+                    OidcUserAuthority oidcUserAuthority = (OidcUserAuthority)authority;
+
+                    OidcIdToken idToken = oidcUserAuthority.getIdToken();
+                    OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
+
+                    // Map the claims found in idToken and/or userInfo
+                    // to one or more GrantedAuthority's and add it to mappedAuthorities
+
+                } else if (OAuth2UserAuthority.class.isInstance(authority)) {
+                    OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority)authority;
+
+                    Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
+
+                    // Map the attributes found in userAttributes
+                    // to one or more GrantedAuthority's and add it to mappedAuthorities
+
+                }
+            });
+
+            return mappedAuthorities;
+        };
     }
 
 

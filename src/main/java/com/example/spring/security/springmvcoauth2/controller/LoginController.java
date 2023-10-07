@@ -21,17 +21,6 @@ public class LoginController {
         return "oauth2-login";
     }
 
-    @GetMapping("/logout-success2")
-    public String logoutSuccess() {
-        return "oauth2-login";
-
-    }
-
-    @GetMapping("/logout2")
-    public String performLogout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        request.logout();
-        return null;
-    }
 
     //@GetMapping("/error")
     public String error(HttpServletRequest request) throws IOException {
