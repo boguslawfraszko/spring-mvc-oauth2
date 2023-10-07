@@ -28,7 +28,7 @@ public class SecurityConfigTest {
     public void testFilterChainWhenRequestToLogoutPageThenRedirectToDefaultSuccessUrl() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/logout"))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login"));
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("/login?logout"));
     }
 
     @Test
@@ -36,7 +36,7 @@ public class SecurityConfigTest {
     public void testFilterChainWhenRequestToProtectedPageThenRedirectToLoginPage() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/protected"))
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login?logout"));
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login"));
     }
 
     @Test
