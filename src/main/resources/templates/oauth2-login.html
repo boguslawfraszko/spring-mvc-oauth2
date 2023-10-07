@@ -1,18 +1,38 @@
 <!doctype html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>OAuth2 Login Demo</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/styles.css" th:href="@{/css/styles.css}">
+
+    <!-- Optional: Bootstrap JS for functionalities -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
 <body>
-<div class="container">
-    <h3>OAuth2 Login Demo</h3>
-    <div class="unauthenticated">
-        <div>
-            With GitHub: <a href="/oauth2/authorization/github">click here</a>
-        </div>
-        <div>
-            With Google: <a href="/oauth2/authorization/google">click here</a>
-        </div>
-        <div>
-            With Facebook: <a href="/oauth2/authorization/facebook">click
-            here</a>
+<div class="container login-container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center login-panel">
+            <h3 class="mb-5">OAuth2 Login Demo</h3>
+
+            <a href="/oauth2/authorization/github" class="btn btn-light">
+                <i class="fab fa-github align-middle"></i> Sign in with GitHub
+            </a>
+            <a href="/oauth2/authorization/google" class="btn btn-light">
+                <i class="fab fa-google align-middle"></i> Sign in with Google
+            </a>
+            <a href="/oauth2/authorization/facebook" class="btn btn-light">
+                <i class="fab fa-facebook-f align-middle"></i> Sign in with Facebook
+            </a>
         </div>
     </div>
 </div>

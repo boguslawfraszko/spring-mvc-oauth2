@@ -57,9 +57,16 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")))
                 .authorizeRequests()
-                    .requestMatchers("/**login**", "/**logout**", "/error", "/webjars/**", "/templates/**")
+                    .requestMatchers(
+                            "/**login**",
+                            "/**logout**",
+                            "/error",
+                            "/webjars/**",
+                            "/templates/**",
+                            "/css/**.css",
+                            "/actuator/**")
                 .permitAll()
-                    .anyRequest().authenticated()
+                .anyRequest().authenticated()
                 .and()
                 .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
                         .loginPage("/login")
