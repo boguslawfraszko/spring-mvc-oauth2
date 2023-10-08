@@ -10,6 +10,9 @@ spring:
           google:
             client-id: 297865767597-qclbnrj2kl2r8kod2tse20n5l2jbp0a6.apps.googleusercontent.com
             client-secret: ${OAUTH2_CLIENT_SECRET}
+          github:
+            client-id: f3edb75f044cb225bc85
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
 
 logging:
   level:

@@ -110,7 +110,7 @@ public class SecurityConfig {
     }
 
     // additional configuration for non-Spring Boot projects
-    private static List<String> clients = Arrays.asList("google", "facebook");
+    private static List<String> clients = Arrays.asList("google", "facebook", "github");
 
 
     @Bean
@@ -148,6 +148,11 @@ public class SecurityConfig {
                     .clientSecret(clientSecret)
                     .build();
             //return this.googleClientRegistration(clientId, clientSecret);
+        } else if (client.equals("github")) {
+            return CommonOAuth2Provider.GITHUB.getBuilder(client)
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .build();
         }
         return null;
     }
