@@ -23,10 +23,7 @@ import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAut
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
@@ -155,6 +152,10 @@ public class SecurityConfig {
         return null;
     }
 
+    /*
+
+    custom override for google registration
+
     private ClientRegistration googleClientRegistration(String clientId, String clientSecret) {
         return ClientRegistration.withRegistrationId("google")
                 .clientId(clientId)
@@ -171,6 +172,7 @@ public class SecurityConfig {
                 .clientName("Google")
                 .build();
     }
+     */
 
     @Bean
     public GrantedAuthoritiesMapper userAuthoritiesMapper() {
