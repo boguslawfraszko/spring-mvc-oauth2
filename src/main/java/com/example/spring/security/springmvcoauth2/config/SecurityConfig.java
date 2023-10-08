@@ -1,5 +1,6 @@
 package com.example.spring.security.springmvcoauth2.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,8 +41,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
     private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
@@ -55,19 +58,29 @@ public class SecurityConfig {
         http
                 .logout(logout -> logout.logoutUrl("/logout")
                         .clearAuthentication(true)
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")))
-                .authorizeRequests()
-                    .requestMatchers(
-                            "/**login**",
-                            "/**logout**",
-                            "/error",
-                            "/webjars/**",
-                            "/templates/**",
-                            "/css/**.css",
-                            "/actuator/**")
-                .permitAll()
-                .anyRequest().authenticated()
-                .and()
+                        .invalidateHttpSession(true)
+                        /*
+                        custom logout handler and redirect
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            log.debug("about to logout for " + authentication);
+                            response.sendRedirect("/login?logout");
+                        })*/
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                        .addLogoutHandler((request, response, authentication) -> {
+                            log.debug("about to logout for " + authentication);
+                        })
+                )
+                .authorizeHttpRequests( authorize -> authorize
+                        .requestMatchers(
+                                "/**login**",
+                                "/**logout**",
+                                "/error",
+                                "/webjars/**",
+                                "/templates/**",
+                                "/css/**.css",
+                                "/actuator/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
                         .loginPage("/login")
                         .failureUrl("/login?error"))
