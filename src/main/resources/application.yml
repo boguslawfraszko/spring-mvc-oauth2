@@ -1,4 +1,10 @@
 server:
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: classpath:spring.p12
+    key-alias: spring
+    key-store-password: password
   servlet:
     context-path: /
 
@@ -13,6 +19,9 @@ spring:
           github:
             client-id: f3edb75f044cb225bc85
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+          facebook:
+            client-id: 1684224615419514
+            client-secret: ${OAUTH2_FACEBOOK_CLIENT_SECRET}
 
 logging:
   level:

@@ -150,6 +150,11 @@ public class SecurityConfig {
                     .clientId(clientId)
                     .clientSecret(clientSecret)
                     .build();
+            case "facebook" -> CommonOAuth2Provider.FACEBOOK.getBuilder(client)
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .scope("public_profile")
+                    .build();
             default -> null;
         };
     }
