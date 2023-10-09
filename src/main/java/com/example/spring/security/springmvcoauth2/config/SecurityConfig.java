@@ -141,20 +141,17 @@ public class SecurityConfig {
         }
 
         String clientSecret = env.getProperty(CLIENT_PROPERTY_KEY + client + ".client-secret");
-        if (client.equals("google")) {
-
-            return CommonOAuth2Provider.GOOGLE.getBuilder(client)
+        return switch (client) {
+            case "google" -> CommonOAuth2Provider.GOOGLE.getBuilder(client)
                     .clientId(clientId)
                     .clientSecret(clientSecret)
                     .build();
-            //return this.googleClientRegistration(clientId, clientSecret);
-        } else if (client.equals("github")) {
-            return CommonOAuth2Provider.GITHUB.getBuilder(client)
+            case "github" -> CommonOAuth2Provider.GITHUB.getBuilder(client)
                     .clientId(clientId)
                     .clientSecret(clientSecret)
                     .build();
-        }
-        return null;
+            default -> null;
+        };
     }
 
     /*
