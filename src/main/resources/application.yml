@@ -7,6 +7,7 @@ server:
     key-store-password: password
   servlet:
     context-path: /
+  port: 8443
 
 spring:
   security:

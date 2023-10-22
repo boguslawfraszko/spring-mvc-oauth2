@@ -80,6 +80,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
                         .loginPage("/login")
+                        .successHandler((request, response, authentication) -> {
+                            log.info("success login for " + authentication);
+                            response.sendRedirect("/persons");
+                        })
                         .failureUrl("/login?error"))
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
