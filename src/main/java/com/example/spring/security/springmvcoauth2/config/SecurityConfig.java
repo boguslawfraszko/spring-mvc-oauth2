@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -96,7 +97,10 @@ public class SecurityConfig {
                                 .maxAgeInSeconds(31536000)
                         )
                 )
-                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+                .csrf(csrf -> csrf.disable())
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure()
+                );
 
         return http.build();
     }
