@@ -8,6 +8,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -80,11 +81,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
                         .loginPage("/login")
+                        /*
                         .successHandler((request, response, authentication) -> {
                             log.info("success login for " + authentication);
                             response.sendRedirect("/persons");
-                        })
+                        })*/
                         .failureUrl("/login?error"))
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
         return http.build();
