@@ -2,11 +2,10 @@ package com.example.spring.security.springmvcoauth2.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -31,7 +30,6 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -39,6 +37,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -100,20 +100,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .requiresChannel(channel -> channel
                         .anyRequest().requiresSecure()
-                );
+                )
+                .cors(withDefaults());
 
         return http.build();
     }
 
-    private CorsConfigurationSource configurationSource() {
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:8443"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("*");
-        config.setAllowCredentials(true);
-        config.addAllowedHeader("X-Requested-With");
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedMethod(HttpMethod.POST);
-        source.registerCorsConfiguration("/logout", config);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -211,6 +210,7 @@ public class SecurityConfig {
 
                     OidcIdToken idToken = oidcUserAuthority.getIdToken();
                     OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
+                    log.info("oidc user info " + userInfo);
 
                     // Map the claims found in idToken and/or userInfo
                     // to one or more GrantedAuthority's and add it to mappedAuthorities
@@ -219,6 +219,7 @@ public class SecurityConfig {
                     OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority)authority;
 
                     Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
+                    log.info("auth2 user attributes " + userAttributes);
 
                     // Map the attributes found in userAttributes
                     // to one or more GrantedAuthority's and add it to mappedAuthorities
