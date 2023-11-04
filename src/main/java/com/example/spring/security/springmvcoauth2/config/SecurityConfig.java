@@ -3,6 +3,7 @@ package com.example.spring.security.springmvcoauth2.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -44,9 +45,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @Slf4j
+@EnableConfigurationProperties(OAuth2ClientProperties.class)
 public class SecurityConfig {
-
-    private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
+    @Autowired
+    private OAuth2ClientProperties oAuth2ClientProperties;
 
     @Autowired
     private Environment env;
@@ -153,12 +155,12 @@ public class SecurityConfig {
     }
 
     private ClientRegistration getRegistration(String client) {
-        String clientId = env.getProperty(CLIENT_PROPERTY_KEY + client + ".client-id");
+        String clientId = oAuth2ClientProperties.getRegistration().get(client).getClientId();
         if (clientId == null) {
             return null;
         }
 
-        String clientSecret = env.getProperty(CLIENT_PROPERTY_KEY + client + ".client-secret");
+        String clientSecret = oAuth2ClientProperties.getRegistration().get(client).getClientSecret();
         return switch (client) {
             case "google" -> CommonOAuth2Provider.GOOGLE.getBuilder(client)
                     .clientId(clientId)

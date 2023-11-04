@@ -1,0 +1,18 @@
+
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 297865767597-qclbnrj2kl2r8kod2tse20n5l2jbp0a6.apps.googleusercontent.com
+            client-secret: fake
+            scope: openid, profile, email
+            authorization-grant-type: client_credentials
+          github:
+            client-id: f3edb75f044cb225bc85
+            client-secret: fake
+          facebook:
+            client-id: 1684224615419514
+            client-secret: fake

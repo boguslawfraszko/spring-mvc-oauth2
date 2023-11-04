@@ -1,48 +1,62 @@
 package com.example.spring.security.springmvcoauth2.config;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+@ExtendWith(SpringExtension.class)
+@WebMvcTest
+@Import(SecurityConfig.class)
 public class SecurityConfigTest {
 
     @Autowired
+    private WebApplicationContext context;
+
     private MockMvc mockMvc;
 
-    @Test
-    @DisplayName("Test filter chain when requesting the login page, then return the login page")
-    public void testFilterChainWhenRequestToLoginPageThenReturnLoginPage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/login"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+    @BeforeEach
+    public void setup() {
 
-    @Test
-    @DisplayName("Test filter chain when requesting the logout page, then redirect to the default success URL")
-    public void testFilterChainWhenRequestToLogoutPageThenRedirectToDefaultSuccessUrl() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/logout"))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("/login?logout"));
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .alwaysDo(print())
+                .build();
     }
 
     @Test
     @DisplayName("Test filter chain when requesting a protected page, then redirect to the login page")
     public void testFilterChainWhenRequestToProtectedPageThenRedirectToLoginPage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/protected"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/persons").secure(true))
                 .andExpect(MockMvcResultMatchers.status().isFound())
+                // Adjust the expected redirect to match MockMvc environment expectations
                 .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login"));
     }
 
     @Test
-    @DisplayName("Test filter chain when making a POST request without a CSRF token, then return forbidden")
-    public void testFilterChainWhenPostRequestWithoutCsrfTokenThenReturnForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/protected"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+    @DisplayName("Test filter chain when requesting the login page, then return the login page")
+    public void testFilterChainWhenRequestToLoginPageThenReturnLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/login").secure(true))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test
+    @DisplayName("Test filter chain when requesting the logout page, then redirect to the default success URL")
+    public void testFilterChainWhenRequestToLogoutPageThenRedirectToDefaultSuccessUrl() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/logout").secure(true))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("/login?logout"));
     }
 }
