@@ -25,7 +25,10 @@ import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAut
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
@@ -128,14 +131,10 @@ public class SecurityConfig {
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         return accessTokenResponseClient;
     }
-
-    // additional configuration for non-Spring Boot projects
-    private static List<String> clients = Arrays.asList("google", "facebook", "github");
-
-
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
-        List<ClientRegistration> registrations = clients.stream()
+
+        List<ClientRegistration> registrations = oAuth2ClientProperties.getRegistration().keySet().stream()
                 .map(c -> getRegistration(c))
                 .filter(registration -> registration != null)
                 .collect(Collectors.toList());
@@ -175,7 +174,19 @@ public class SecurityConfig {
                     .clientSecret(clientSecret)
                     .scope("public_profile")
                     .build();
-            default -> null;
+            default -> ClientRegistration.withRegistrationId(client)
+                    .clientId(clientId)
+                    .clientSecret(clientSecret)
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                    .scope("openid", "profile", "email", "address", "phone")
+                    .authorizationUri(oAuth2ClientProperties.getProvider().get(client).getAuthorizationUri())
+                    .tokenUri(oAuth2ClientProperties.getProvider().get(client).getTokenUri())
+                    .userInfoUri(oAuth2ClientProperties.getProvider().get(client).getUserInfoUri())
+                    .userNameAttributeName(IdTokenClaimNames.SUB)
+                    .clientName(client)
+                    .build();
         };
     }
 

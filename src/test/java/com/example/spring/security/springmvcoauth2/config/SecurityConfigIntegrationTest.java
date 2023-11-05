@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest
 @Import(SecurityConfig.class)
-public class SecurityConfigTest {
+public class SecurityConfigIntegrationTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -42,7 +42,6 @@ public class SecurityConfigTest {
     public void testFilterChainWhenRequestToProtectedPageThenRedirectToLoginPage() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/persons").secure(true))
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                // Adjust the expected redirect to match MockMvc environment expectations
                 .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login"));
     }
 
