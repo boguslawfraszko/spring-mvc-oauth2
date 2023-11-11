@@ -1,21 +1,24 @@
 package com.example.spring.security.springmvcoauth2.config;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -23,11 +26,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, TestClientConfig.class})
 @WebMvcTest
 public class SecurityConfigE2ETest {
 
     private MockMvc mockMvc;
+
+    @Autowired @Qualifier("testNoCertVerificationRestTemplate")
+    RestTemplate restTemplate;
 
     @Autowired
     private WebApplicationContext context;
@@ -48,7 +54,7 @@ public class SecurityConfigE2ETest {
     }
 
     @Test
-    @DisplayName("Should redirect to OAuth authorize url and with return url containing nounce ")
+    @DisplayName("Should redirect to OAuth authorize url and with return url containing nonce ")
     public void testOAuth2Authorization() throws Exception {
 
         mockMvc.perform(get("/oauth2/authorization/test-oauth-provider").secure(true))
@@ -94,9 +100,10 @@ public class SecurityConfigE2ETest {
                                 """.formatted(state))
                         .withStatus(302)));
 
-        mockMvc.perform(get(authorizeRedirectedUrl)
-                        .secure(true))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/persons"));
+        var response = restTemplate.getForEntity(authorizeRedirectedUrl, String.class);
+
+
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.FOUND);
+        WireMock.verify(exactly(1), getRequestedFor(urlPathTemplate(path)));
     }
 }
