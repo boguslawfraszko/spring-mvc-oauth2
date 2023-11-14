@@ -17,7 +17,7 @@ spring:
           test-oauth-provider:
             client-id: fake
             client-secret: fake
-            scope: openid, profile, emailó
+            scope: openid
         provider:
           test-oauth-provider:
             authorization-uri: https://localhost:8089/oauth/authorize
