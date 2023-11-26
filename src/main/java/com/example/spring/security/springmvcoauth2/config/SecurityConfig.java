@@ -63,12 +63,6 @@ public class SecurityConfig {
                 .logout(logout -> logout.logoutUrl("/logout")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
-                        /*
-                        custom logout handler and redirect
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            log.debug("about to logout for " + authentication);
-                            response.sendRedirect("/login?logout");
-                        })*/
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
                         .addLogoutHandler((request, response, authentication) -> {
                             log.debug("about to logout for " + authentication);
@@ -87,11 +81,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2Login(conf -> conf.defaultSuccessUrl("/persons")
                         .loginPage("/login")
-                        /*
-                        .successHandler((request, response, authentication) -> {
-                            log.info("success login for " + authentication);
-                            response.sendRedirect("/persons");
-                        })*/
                         .failureUrl("/login?error"))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
@@ -154,12 +143,13 @@ public class SecurityConfig {
     }
 
     private ClientRegistration getRegistration(String client) {
-        String clientId = oAuth2ClientProperties.getRegistration().get(client).getClientId();
+        OAuth2ClientProperties.Registration registration = oAuth2ClientProperties.getRegistration().get(client);
+        String clientId = registration.getClientId();
         if (clientId == null) {
             return null;
         }
 
-        String clientSecret = oAuth2ClientProperties.getRegistration().get(client).getClientSecret();
+        String clientSecret = registration.getClientSecret();
         return switch (client) {
             case "google" -> CommonOAuth2Provider.GOOGLE.getBuilder(client)
                     .clientId(clientId)
@@ -174,43 +164,25 @@ public class SecurityConfig {
                     .clientSecret(clientSecret)
                     .scope("public_profile")
                     .build();
-            default -> ClientRegistration.withRegistrationId(client)
-                    .clientId(clientId)
-                    .clientSecret(clientSecret)
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                    .scope("openid", "profile", "email", "address", "phone")
-                    .authorizationUri(oAuth2ClientProperties.getProvider().get(client).getAuthorizationUri())
-                    .tokenUri(oAuth2ClientProperties.getProvider().get(client).getTokenUri())
-                    .userInfoUri(oAuth2ClientProperties.getProvider().get(client).getUserInfoUri())
-                    .userNameAttributeName(IdTokenClaimNames.SUB)
-                    .clientName(client)
-                    .build();
+            default -> {
+                OAuth2ClientProperties.Provider provider = oAuth2ClientProperties.getProvider().get(client);
+                yield ClientRegistration.withRegistrationId(client)
+                        .clientId(clientId)
+                        .clientSecret(clientSecret)
+                        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                        .scope("openid")
+                        .authorizationUri(provider.getAuthorizationUri())
+                        .tokenUri(provider.getTokenUri())
+                        .userInfoUri(provider.getUserInfoUri())
+                        .jwkSetUri(provider.getJwkSetUri())
+                        .userNameAttributeName(IdTokenClaimNames.SUB)
+                        .clientName(client)
+                        .build();
+            }
         };
     }
-
-    /*
-
-    custom override for google registration
-
-    private ClientRegistration googleClientRegistration(String clientId, String clientSecret) {
-        return ClientRegistration.withRegistrationId("google")
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                .scope("openid", "profile", "email", "address", "phone")
-                .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
-                .tokenUri("https://www.googleapis.com/oauth2/v4/token")
-                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-                .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
-                .clientName("Google")
-                .build();
-    }
-     */
 
     @Bean
     public GrantedAuthoritiesMapper userAuthoritiesMapper() {

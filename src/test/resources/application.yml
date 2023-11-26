@@ -14,14 +14,15 @@ spring:
     oauth2:
       client:
         registration:
-          test-oauth-provider:
-            client-id: fake
-            client-secret: fake
+          keycloak:
+            client-id: test-spring-client
+            authorization-grant-type: authorization_code
             scope: openid
         provider:
-          test-oauth-provider:
-            authorization-uri: https://localhost:8089/oauth/authorize
-            token-uri: https://localhost:8089/oauth/token
-            user-info-uri: https://localhost:8089/userinfo
-            user-name-attribute: sub
-
+          keycloak:
+            authorization-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/auth
+            token-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/token
+            issuer-uri: http://localhost:8081/realms/test-spring-realm
+            user-info-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/userinfo
+            user-name-attribute: test
+            jwk-set-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/certs
