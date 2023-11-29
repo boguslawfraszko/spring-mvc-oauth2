@@ -15,6 +15,7 @@ import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,6 +28,7 @@ import java.security.cert.X509Certificate;
 public class TestClientConfig {
 
     @Bean
+    @Scope("prototype")
     public RestTemplate testNoCertVerificationRestTemplate() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         PoolingHttpClientConnectionManager connectionManager = getConnectionManager();
 
