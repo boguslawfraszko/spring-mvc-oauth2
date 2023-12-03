@@ -24,6 +24,6 @@ public class PersonController {
     @GetMapping
     public String getAllPersons(Model model) {
         model.addAttribute("persons", persons);
-        return "persons";
+        return "persons-view";
     }
 }

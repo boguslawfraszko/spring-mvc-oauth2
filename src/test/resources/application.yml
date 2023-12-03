@@ -14,6 +14,16 @@ spring:
     oauth2:
       client:
         registration:
+          google:
+            client-id: 297865767597-qclbnrj2kl2r8kod2tse20n5l2jbp0a6.apps.googleusercontent.com
+            client-secret: ${OAUTH2_CLIENT_SECRET}
+            scope: openid, profile, email
+          github:
+            client-id: f3edb75f044cb225bc85
+            client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET}
+          facebook:
+            client-id: 1684224615419514
+            client-secret: ${OAUTH2_FACEBOOK_CLIENT_SECRET}
           keycloak:
             client-id: test-spring-client
             authorization-grant-type: authorization_code
@@ -22,7 +32,7 @@ spring:
           keycloak:
             authorization-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/auth
             token-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/token
-            issuer-uri: http://localhost:8081/realms/test-spring-realm
+            issuer-uri: http://localhost:8081/realms/test-spring
             user-info-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/userinfo
             user-name-attribute: test
             jwk-set-uri: http://localhost:8081/realms/test-spring/protocol/openid-connect/certs

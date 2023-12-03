@@ -4,10 +4,11 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -35,18 +36,18 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(OAuth2ClientController.class)
+@WebMvcTest(value = OAuth2ClientController.class, excludeAutoConfiguration = {OAuth2ClientAutoConfiguration.class})
 @ExtendWith(SpringExtension.class)
 public class OAuth2ClientControllerTest {
 
-    @InjectMocks
-    private OAuth2ClientController controller;
-
-    @Mock
+    @MockBean
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @Mock
+    @MockBean
     private OAuth2AuthorizedClientService authorizedClientService;
+
+    @Autowired
+    private OAuth2ClientController controller;
 
     private MockMvc mockMvc;
 
