@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.controller;
+package com.example.spring.security.oauth2.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

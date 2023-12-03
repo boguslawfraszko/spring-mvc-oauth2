@@ -1,6 +1,6 @@
-package com.example.spring.security.springmvcoauth2.controller;
+package com.example.spring.security.oauth2.controller;
 
-import com.example.spring.security.springmvcoauth2.model.Person;
+import com.example.spring.security.oauth2.model.Person;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

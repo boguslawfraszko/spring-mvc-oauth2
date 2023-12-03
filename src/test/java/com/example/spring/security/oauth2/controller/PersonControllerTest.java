@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.controller;
+package com.example.spring.security.oauth2.controller;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;

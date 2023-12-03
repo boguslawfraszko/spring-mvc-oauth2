@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2;
+package com.example.spring.security.oauth2;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

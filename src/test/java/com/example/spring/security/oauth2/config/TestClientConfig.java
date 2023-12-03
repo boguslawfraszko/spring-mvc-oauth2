@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.config;
+package com.example.spring.security.oauth2.config;
 
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;

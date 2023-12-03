@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.controller;
+package com.example.spring.security.oauth2.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

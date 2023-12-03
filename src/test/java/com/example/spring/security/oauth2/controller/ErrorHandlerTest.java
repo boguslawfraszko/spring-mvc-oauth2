@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.controller;
+package com.example.spring.security.oauth2.controller;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

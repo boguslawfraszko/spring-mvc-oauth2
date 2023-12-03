@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.config;
+package com.example.spring.security.oauth2.config;
 
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;

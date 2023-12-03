@@ -1,4 +1,4 @@
-package com.example.spring.security.springmvcoauth2.model;
+package com.example.spring.security.oauth2.model;
 
 public class Person {
     private String name;
